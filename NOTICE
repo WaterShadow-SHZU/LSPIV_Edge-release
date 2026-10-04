@@ -1,0 +1,114 @@
+# NOTICE
+
+This repository contains original work **and** modified third-party code.
+The distinction matters if you plan to redistribute or publish.
+
+---
+
+## 1. Original work — MIT
+
+The following are original and licensed under the MIT License (see `LICENSE`):
+
+| Path | Description |
+|---|---|
+| `lspiv_batch.py` | The batch driver: scheduling, parallel conversion, solver orchestration |
+| `export_results.py` | DAT → CSV conversion (legacy `vel_raw/vel_real.csv` + multi-frame `physics_twin_series.csv` / `frames_manifest.json`) |
+| `preview_results.py` | Optional quiver plot |
+| `process_video.*`, `export_csv.*` | Entry-point scripts |
+| `tools/arm/build_arm.sh`, `tools/arm/makefile` | ARM build system |
+| `tools/build_windows.bat` | Windows build script |
+| `docs/` | All documentation |
+| `tests/` | Regression tests |
+
+`export_results.py` (including the multi-frame export) is pure Python written for this
+project. It only *reads* the text `.dat` files the solver writes; it contains no code from the
+INRAE/IRSTEA Fortran solver or from Fudaa-LSPIV, so it stays MIT (not LGPL-3.0).
+
+---
+
+## 2. Modified third-party code — LGPL-3.0
+
+### `tools/solver-patches/`
+
+The Fortran solver in `tools/solver-patches/` is derived from:
+
+> **Image_Velocimetry_Solver**
+> INRAE / IRSTEA, France
+> https://forge.irstea.fr/projects/lspiv-solver
+> Licensed under the **GNU Lesser General Public License v3.0**
+
+**This is a modified version.** We changed 4 of the 33 source files. In accordance with
+LGPL-3.0 §4 (Combined Works) and §6, we state the changes explicitly:
+
+| File | Nature of change |
+|---|---|
+| `sub_PIV.f90` | Added an auto-detecting P5/P2 PGM reader; fixed two uninitialised-variable defects |
+| `sub_transf_23D.f90` | Added an auto-detecting P5/P2 PGM reader |
+| `transf_23D.f90` | Repointed the image-reader function pointer to the new reader |
+| `sub_lspiv_parameter.f90` | Changed the parameter file open mode from read-only to read-write |
+
+The **unmodified originals** of those 4 files are preserved in
+`tools/solver-patches/upstream-original/` so the diff can be reconstructed at any time.
+
+Full license texts: `tools/solver-patches/LICENSE.upstream` (LGPL-3.0),
+`tools/solver-patches/COPYING.LGPL`, `tools/solver-patches/COPYING.GPL`.
+
+A detailed description of each change, with the upstream defect it addresses, is in
+[`docs/SOLVER-PATCHES.md`](docs/SOLVER-PATCHES.md).
+
+**To rebuild from unmodified upstream sources**, point the build at your own checkout
+of `Image_Velocimetry_Solver/sources/` and expect to run in P2 mode (`--no-pgm-binary`),
+which is roughly 59× slower.
+
+---
+
+## 3. Prebuilt binaries (Windows)
+
+### `bin/windows/` — solver binaries
+
+Six executables built by this project from the LGPL-3.0 sources above:
+
+```
+PIV.exe  transf_a.exe  ortho_plan.exe  vel_transf.exe  filter.exe  vel_scal.exe
+```
+
+They are therefore covered by **LGPL-3.0**. Corresponding source is
+`tools/solver-patches/`. Build instructions: `docs/BUILDING.md`.
+
+### FFmpeg
+
+FFmpeg and ffprobe are not included. Users install a build separately and are
+responsible for following its license terms. The driver locates both programs on
+`PATH`; see https://ffmpeg.org/download.html.
+
+---
+
+## 4. The Fudaa-LSPIV GUI
+
+`LSPIV_Edge` **does not include or link against the Fudaa-LSPIV GUI**, which is
+separate software licensed under **GPL-2.0**:
+
+> Fudaa-LSPIV — https://forge.irstea.fr/projects/fudaa-lspiv
+
+You need the GUI once, to produce the calibration files for a new measurement site.
+It is not needed at run time.
+
+---
+
+## 5. Citing upstream
+
+If you publish results produced with this tool, please cite the upstream Fudaa-LSPIV work:
+
+> Le Coz, J., Patalano, A., Collins, D., Guillén, N. F., García, C. M., Smart, G. M.,
+> Bind, J., Chiaverini, A., Le Boursicaud, R., Dramais, G., & Braud, I. (2016).
+> *Measuring surface velocity with large-scale particle image velocimetry: a practical
+> guide.* Journal of Hydrology, 541, 1214-1230.
+
+and acknowledge the INRAE development of Fudaa-LSPIV / Image_Velocimetry_Solver.
+
+---
+
+## 6. Trademarks
+
+"Fudaa", "LSPIV", "FFmpeg" and other names are the property of their respective owners.
+This project is an independent derivative and is not endorsed by INRAE.

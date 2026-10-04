@@ -1,0 +1,9 @@
+{
+  "workers": 4,
+  "keep_workdirs": false,
+  "frame_every": 1,
+  "ffmpeg_options": [],
+  "solver_mode": "auto",
+  "solver_threads": 1,
+  "pgm_binary": true
+}

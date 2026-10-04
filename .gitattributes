@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: MIT
+# Normalise line endings on commit; check out with sane defaults per platform.
+* text=auto
+
+# ── Shell scripts MUST keep LF ────────────────────────────────────────────────
+# These run on Linux / ARM. A CRLF checkout produces
+#   bash: ./build_arm.sh: /bin/bash^M: bad interpreter
+# so we pin them explicitly rather than trusting core.autocrlf.
+*.sh            text eol=lf
+*.bash          text eol=lf
+*.f90           text eol=lf
+*.py            text eol=lf
+*.json          text eol=lf
+makefile        text eol=lf
+Makefile        text eol=lf
+*.dat           text eol=lf
+# Calibration files supplied by users are text inputs read line by line by the solvers.
+
+*.service       text eol=lf
+*.timer         text eol=lf
+*.socket        text eol=lf
+*.env           text eol=lf
+*.example       text eol=lf
+*.conf          text eol=lf
+*.csv           text eol=lf
+*.txt           text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.toml          text eol=lf
+*.cfg           text eol=lf
+*.ini           text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+
+# ── Windows batch files keep CRLF ────────────────────────────────────────────
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+
+# ── Documentation: LF everywhere (renders identically on GitHub) ─────────────
+*.md            text eol=lf
+LICENSE         text
+NOTICE          text
+COPYING*        text
+
+# ── Binaries: never touch, never diff ────────────────────────────────────────
+*.exe           binary
+*.dll           binary
+*.lib           binary
+*.a             binary
+*.so            binary
+*.gz            binary
+*.tgz           binary
+*.zip           binary
+*.tar           binary
+*.xz            binary
+*.bz2           binary
+*.7z            binary
+*.pdf           binary
+
+# ── Media: not diffable ──────────────────────────────────────────────────────
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.pgm           binary
+*.mp4           binary
+*.avi           binary
+*.mov           binary
+*.mkv           binary
+*.gif           binary
+*.bmp           binary
+*.tif           binary
+*.tiff          binary
+*.webp          binary
+*.ico           binary
+
+# ── Video/case data should never appear in diffs on GitHub ───────────────────
+*.dat           -diff

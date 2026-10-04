@@ -1,0 +1,65 @@
+# ---------------------------------------------------------------------------
+# LSPIV_Edge
+# ---------------------------------------------------------------------------
+
+# Per-user configuration (config.example.json IS tracked)
+config.json
+
+# Results — these get large fast (a 935-frame run is >5 GB)
+runs/*
+!runs/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Build scratch
+tools/arm/build_arm/
+tools/arm/exes_arm/
+bin/rebuild/
+*.mod
+*.o
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Calibration data
+# ---------------------------------------------------------------------------
+# Site calibration files may contain measurement geometry; keep local data out.
+calib/**
+!calib/README.txt
+
+# ---------------------------------------------------------------------------
+# Examples
+# ---------------------------------------------------------------------------
+# Video files are too large for git. Keep example videos out and either:
+#   - reference a download URL in examples/*/README.md, or
+#   - use Git LFS if you really must version them.
+examples/**/*.mp4
+examples/**/*.mov
+examples/**/*.avi
+examples/**/*.mkv
+
+# Intermediate images — large, and regenerable from the video
+examples/**/frames/
+examples/**/img_pgm/
+examples/**/img_transf/
+examples/**/tmp/
+
+# Keep example RESULTS tracked (they are small and are the point of an example):
+#   examples/**/vel_real/
+#   examples/**/export/
+# ...but drop the bulky per-frame raw output:
+examples/**/vel_raw/
