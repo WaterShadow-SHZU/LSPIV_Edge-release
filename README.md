@@ -51,13 +51,25 @@ bash process_video.sh your_video.mp4
 
 ## Performance
 
-The figure uses the measurements recorded for a 935-frame, 1920×1080 run on a 12-core desktop. Treat the proportions as transferable and the absolute times as machine-specific. After these optimisations, orthorectification is the largest remaining cost. Tables and the method are in the [performance notes](docs/PERFORMANCE.md).
+The figures use the measurements recorded for a 935-frame, 1920×1080 run on a 12-core desktop. Treat the proportions as transferable and the absolute times as machine-specific. After these optimisations, orthorectification is the largest remaining cost. Tables and the method are in the [performance notes](docs/PERFORMANCE.md).
 
-![Frame conversion, orthorectification scaling, P5 against P2, and stage times](docs/images/performance-comparison.png)
+![Frame conversion for 935 frames](docs/images/performance-conversion.png)
 
-*(a)* PNG to PGM for 935 frames: one ffmpeg per frame ~172 s, one ffmpeg per batch ~78 s, eight ffmpeg processes writing P5 directly ~16 s. *(b)* Orthorectification on 48-frame batches: 0.329, 0.205, 0.188, 0.189, 0.201, and 0.225 s/frame at 1, 2, 4, 6, 8, and 12 processes. The minimum is at 4, the default; 8 and 12 are slower. *(c)* A 1089×591 image is ~2.5 MB as P2 and ~0.64 MB as P5. The solver reads a pair in 14.85 s from P2 and in 0.25 s from P5, 59× ([solver patches](docs/SOLVER-PATCHES.md)). On this run, `img_pgm/` and `img_transf/` each drop from about 2.4 GB to about 0.6 GB ([ARM deployment](docs/ARM-DEPLOYMENT-zh.md)). *(d)* Stage times from the same performance note. Orthorectification is ~40 s and is listed at ~46%, the largest share. Parsing in the transform fell from 0.335 s/frame to 0.070 s/frame (4.8×, byte-identical), and the reproducibility fix leaves 0 difference across all 9 columns.
+PNG to PGM: one ffmpeg per frame ~172 s, one ffmpeg per batch ~78 s, eight ffmpeg processes writing P5 directly ~16 s.
 
-Redraw the figure with `python3 docs/images/plot_performance.py`.
+![Orthorectification time versus process count](docs/images/performance-ortho.png)
+
+On 48-frame batches the times are 0.329, 0.205, 0.188, 0.189, 0.201, and 0.225 s/frame at 1, 2, 4, 6, 8, and 12 processes. The minimum is at 4, the default.
+
+![P5 against P2: read time and file size](docs/images/performance-p5.png)
+
+A 1089×591 image is ~2.5 MB as P2 and ~0.64 MB as P5. The solver reads a pair in 14.85 s from P2 and in 0.25 s from P5, 59× ([solver patches](docs/SOLVER-PATCHES.md)). On this run, `img_pgm/` and `img_transf/` each drop from about 2.4 GB to about 0.6 GB ([ARM deployment](docs/ARM-DEPLOYMENT-zh.md)).
+
+![Stage times for the 935-frame run](docs/images/performance-stages.png)
+
+Stage times from the same note. Orthorectification is ~40 s (~46%), the largest share. The light tip on Real coordinates is the documented ~12–16 s range. Parsing in the transform fell from 0.335 s/frame to 0.070 s/frame (4.8×, byte-identical), and the reproducibility fix leaves 0 difference across all 9 columns.
+
+Redraw the figures with `python3 docs/images/plot_performance.py`.
 
 ---
 
@@ -158,7 +170,7 @@ LSPIV_Edge-release/
 │   ├── SOLVER-PATCHES.md       ← what we changed in the Fortran solver, and why
 │   ├── BUILDING.md             ← how to build on Windows and on ARM
 │   ├── PERFORMANCE.md          ← multicore analysis, benchmark methodology
-│   ├── images/                 ← comparison figure and the script that draws it
+│   ├── images/                 ← performance figures and the script that draws them
 │   └── ARM-DEPLOYMENT-zh.md    ← ARM 部署说明
 └── examples/                   ← how to add an example (none included)
 ```
