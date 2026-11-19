@@ -42,8 +42,12 @@ The Fortran solver in `tools/solver-patches/` is derived from:
 
 > **Image_Velocimetry_Solver**
 > INRAE / IRSTEA, France
-> https://forge.irstea.fr/projects/lspiv-solver
+> https://gitlab.irstea.fr/image_velocimetry/velocimetry_solver
 > Licensed under the **GNU Lesser General Public License v3.0**
+
+The durable entry point for the project is the INRAE RiverLY page,
+https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv.
+`gitlab.irstea.fr` is scheduled to close on 30 June 2026.
 
 **This is a modified version.** We changed 4 of the 33 source files. In accordance with
 LGPL-3.0 §4 (Combined Works) and §6, we state the changes explicitly:
@@ -64,10 +68,13 @@ Full license texts: `tools/solver-patches/LICENSE.upstream` (LGPL-3.0),
 `tools/arm/makefile` carries the same upstream header. It stays under that
 solver license grant. The root `LICENSE` covers the original work in section 1.
 
-`kdtree2.f90` carries a separate notice: copyright Matthew Kennel (2004),
-Academic Free License version 1.1, "found in file LICENSE". This repository
-does not include that AFL 1.1 text. The root `LICENSE` covers the original
-work in section 1; `kdtree2.f90` keeps the notice in its own header.
+`kdtree2.f90` is third-party code by Matthew Kennel, Institute for Nonlinear
+Science (2004). Its header places it under the Academic Free License version 1.1,
+"found in file LICENSE", together with the additional provisions in that same
+file. The text shipped here is `tools/solver-patches/LICENSE.kdtree2-AFL-1.1`
+(the official AFL-1.1 terms, unmodified). That file is what the header's
+"LICENSE" refers to. The root `LICENSE` covers the original work in section 1.
+`kdtree2.f90` stays under AFL-1.1.
 
 A detailed description of each change, with the upstream defect it addresses, is in
 [`docs/SOLVER-PATCHES.md`](docs/SOLVER-PATCHES.md).
@@ -88,8 +95,10 @@ Six executables built by this project from the LGPL-3.0 sources above:
 PIV.exe  transf_a.exe  ortho_plan.exe  vel_transf.exe  filter.exe  vel_scal.exe
 ```
 
-They are therefore covered by **LGPL-3.0**. Corresponding source is
+They are covered by **LGPL-3.0**. Corresponding source is
 `tools/solver-patches/`. Build instructions: `docs/BUILDING.md`.
+`filter.exe` is built with `kdtree2.f90`, which remains under AFL-1.1
+(`LICENSE.kdtree2-AFL-1.1`).
 
 ### FFmpeg
 
@@ -101,30 +110,51 @@ responsible for following its license terms. The driver locates both programs on
 
 ## 4. The Fudaa-LSPIV GUI
 
-`LSPIV_Edge` **does not include or link against the Fudaa-LSPIV GUI**, which is
-separate software licensed under **GPL-2.0**:
+`LSPIV_Edge` does not include or link against the Fudaa-LSPIV GUI. That GUI is
+separate software under **GPL-2.0**:
 
-> Fudaa-LSPIV — https://forge.irstea.fr/projects/fudaa-lspiv
+> https://gitlab.com/fudaa/fudaa-lspiv
+
+The user manual is https://gitlab.com/fudaa/fudaa-lspiv/-/wikis/home.
+The project page is
+https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv.
 
 You need the GUI once, to produce the calibration files for a new measurement site.
 It is not needed at run time.
 
 ---
 
-## 5. Citing upstream
+## 5. Acknowledgements and citations
 
-If you publish results produced with this tool, please cite the upstream Fudaa-LSPIV work:
+Fudaa-LSPIV is co-developed and distributed by EDF and INRAE with DeltaCAD, since 2010.
+
+| | |
+|---|---|
+| Project page | https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv |
+| User manual | https://gitlab.com/fudaa/fudaa-lspiv/-/wikis/home |
+| GUI source (GNU GPL v2) | https://gitlab.com/fudaa/fudaa-lspiv |
+| Solver source (GNU LGPL v3) | https://gitlab.irstea.fr/image_velocimetry/velocimetry_solver |
+
+The project page is the durable entry point. `gitlab.irstea.fr` is scheduled to close on 30 June 2026.
+
+LSPIV_Edge is an independent derivative for canal and river measurement. It is not an official product of INRAE, EDF, or DeltaCAD, and it is not endorsed by them.
+
+If you publish results produced with this tool, cite the software as the upstream project requests:
+
+> Le Coz, J., Jodeau, M., Hauet, A., Marchand, B., Le Boursicaud, R. (2014).
+> Image-based velocity and discharge measurements in field and laboratory river
+> engineering studies using the free FUDAA-LSPIV software. River Flow 2014,
+> Lausanne, Switzerland.
+
+The practical guide is also appropriate:
 
 > Le Coz, J., Patalano, A., Collins, D., Guillén, N. F., García, C. M., Smart, G. M.,
 > Bind, J., Chiaverini, A., Le Boursicaud, R., Dramais, G., & Braud, I. (2016).
 > *Measuring surface velocity with large-scale particle image velocimetry: a practical
 > guide.* Journal of Hydrology, 541, 1214-1230.
 
-and acknowledge the INRAE development of Fudaa-LSPIV / Image_Velocimetry_Solver.
-
 ---
 
 ## 6. Trademarks
 
-"Fudaa", "LSPIV", "FFmpeg" and other names are the property of their respective owners.
-This project is an independent derivative and is not endorsed by INRAE.
+"Fudaa", "LSPIV", "FFmpeg", and other names are the property of their respective owners.

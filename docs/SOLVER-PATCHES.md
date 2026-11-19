@@ -160,9 +160,13 @@ done
 Or, if you have the upstream repository cloned:
 
 ```bash
-git clone https://forge.irstea.fr/projects/lspiv-solver.git upstream
+git clone https://gitlab.irstea.fr/image_velocimetry/velocimetry_solver.git upstream
 diff -ru upstream/sources tools/solver-patches
 ```
+
+The durable project page is
+https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv.
+`gitlab.irstea.fr` is scheduled to close on 30 June 2026.
 
 ---
 

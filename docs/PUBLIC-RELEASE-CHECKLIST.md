@@ -18,11 +18,10 @@ history or replace a legal review.
   chosen build.
 - [x] Fudaa-LSPIV GUI files are not included. That GUI remains separate software
   under GPL-2.0.
-- [ ] `tools/solver-patches/kdtree2.f90` identifies itself as Academic Free
-  License 1.1 and points at a file named `LICENSE` for that text. This
-  repository does not include the AFL 1.1 text. The root `LICENSE` is the GPL
-  for original work and does not apply to `kdtree2.f90`. Resolve that notice
-  before distribution.
+- [x] `tools/solver-patches/kdtree2.f90` remains under the Academic Free
+  License 1.1. The official text is
+  `tools/solver-patches/LICENSE.kdtree2-AFL-1.1`. The root `LICENSE` covers
+  original work and does not apply to `kdtree2.f90`. `NOTICE` records this.
 - [ ] Before adding external code or binaries, record the source, exact version,
   applicable license, required notices, and corresponding source obligations.
 

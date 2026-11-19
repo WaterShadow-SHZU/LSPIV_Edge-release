@@ -2,7 +2,7 @@
 
 **Turn a river video into a surface-velocity table — one command, no clicking through a GUI.**
 
-`LSPIV_Edge` is a batch driver for [Fudaa-LSPIV](https://forge.irstea.fr/projects/fudaa-lspiv) (INRAE's Large-Scale Particle Image Velocimetry software). Instead of stepping through the graphical interface for every frame set, you hand it a video and it runs the whole chain automatically:
+`LSPIV_Edge` is a batch driver for [Fudaa-LSPIV](https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv), large-scale particle image velocimetry software co-developed by EDF and INRAE with DeltaCAD. Instead of stepping through the graphical interface for every frame set, you hand it a video and it runs the whole chain automatically:
 
 ```
 video  →  frame extraction  →  orthorectification  →  cross-correlation  →  CSV
@@ -188,19 +188,40 @@ No measurement data is currently included. See [`examples/README.md`](examples/R
 
 ---
 
+## Acknowledgements
+
+Fudaa-LSPIV is co-developed and distributed by EDF and INRAE with DeltaCAD, since 2010. LSPIV_Edge thanks those authors for the free software this driver runs.
+
+LSPIV_Edge is an independent derivative for canal and river measurement. It is not an official product of INRAE, EDF, or DeltaCAD, and it is not endorsed by them. The names Fudaa and LSPIV belong to their respective owners.
+
+| | |
+|---|---|
+| Project page | https://riverhydraulics.riverly.inrae.fr/eng/tools/measurement-software/fudaa-lspiv |
+| User manual | https://gitlab.com/fudaa/fudaa-lspiv/-/wikis/home |
+| GUI source (GNU GPL v2) | https://gitlab.com/fudaa/fudaa-lspiv |
+| Solver source (GNU LGPL v3) | https://gitlab.irstea.fr/image_velocimetry/velocimetry_solver |
+
+The project page is the durable entry point. The solver host `gitlab.irstea.fr` is scheduled to close on 30 June 2026.
+
+Please cite the software as the upstream project requests:
+
+> Le Coz, J., Jodeau, M., Hauet, A., Marchand, B., Le Boursicaud, R. (2014). Image-based velocity and discharge measurements in field and laboratory river engineering studies using the free FUDAA-LSPIV software. River Flow 2014, Lausanne, Switzerland.
+
+The 2016 practical guide remains appropriate as well. Both citations are in [NOTICE](NOTICE).
+
+LSPIV_Edge 感谢 EDF、INRAE 与 DeltaCAD 自 2010 年起共同开发并分发 Fudaa-LSPIV。本工具是用于渠道与河流测流的独立衍生程序，并非上述机构的官方产品，也未获得其认可。Fudaa 与 LSPIV 的名称归各自权利人所有。
+
+---
+
 ## License
 
 | Component | License |
 |---|---|
 | Original work: Python batch driver, shell and batch scripts, original build scripts (`tools/arm/build_arm.sh`, `tools/build_windows.bat`), tests, and documentation | **GPL-3.0-or-later** — GNU General Public License v3 or any later version; see [LICENSE](LICENSE) |
-| `tools/solver-patches/` — the Fortran solver, and `tools/arm/makefile` | **LGPL-3.0**, inherited from INRAE `Image_Velocimetry_Solver`. `tools/arm/makefile` keeps the upstream header (LGPL-3.0, or GPL-2.0 or any later version) |
-| `bin/windows/*.exe` — prebuilt Windows solver binaries | **LGPL-3.0**, built from the solver sources above |
+| `tools/solver-patches/` — the Fortran solver, except `kdtree2.f90`, and `tools/arm/makefile` | **LGPL-3.0**, inherited from INRAE `Image_Velocimetry_Solver`. `tools/arm/makefile` keeps the upstream header (LGPL-3.0, or GPL-2.0 or any later version) |
+| `tools/solver-patches/kdtree2.f90` | **AFL-1.1** — Academic Free License 1.1, Matthew Kennel (2004). Text: [LICENSE.kdtree2-AFL-1.1](tools/solver-patches/LICENSE.kdtree2-AFL-1.1) |
+| `bin/windows/*.exe` — prebuilt Windows solver binaries | **LGPL-3.0**, built from the solver sources above. `filter.exe` also includes `kdtree2.f90` (AFL-1.1) |
 | FFmpeg and ffprobe | **Not bundled.** Install them separately and follow that build's license |
 | Fudaa-LSPIV GUI | **Not included.** It remains separate software under **GPL-2.0** |
 
-Upstream projects:
-
-- Fudaa-LSPIV GUI — https://forge.irstea.fr/projects/fudaa-lspiv (GPL-2.0)
-- Image_Velocimetry_Solver — https://forge.irstea.fr/projects/lspiv-solver (LGPL-3.0)
-
-If you use this tool in academic work, please cite the upstream Fudaa-LSPIV publication as well — see [NOTICE](NOTICE).
+Upstream homes and the requested citation are in [Acknowledgements](#acknowledgements). Full notices are in [NOTICE](NOTICE).
