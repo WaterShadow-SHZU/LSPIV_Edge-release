@@ -9,6 +9,13 @@ Notable changes to `LSPIV_Edge`. Dates are in `YYYY-MM-DD`.
 Initial open-source release. The tool was developed as an internal batch driver for
 Fudaa-LSPIV and is published here in a cleaned-up, self-contained form.
 
+Original work — the Python batch driver, shell and batch scripts, original build
+scripts, tests, and documentation — is released under the GNU General Public
+License, version 3 or any later version (SPDX `GPL-3.0-or-later`; see `LICENSE`).
+The Fortran solver in `tools/solver-patches/` and the prebuilt Windows binaries in
+`bin/windows/` remain under the GNU Lesser General Public License, version 3.
+FFmpeg is not bundled. The Fudaa-LSPIV GUI is not included and remains GPL-2.0.
+
 ### Added
 
 - **Multi-frame export** (`export_results.py`, export schema 2) — besides the unchanged

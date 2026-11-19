@@ -17,7 +17,7 @@ It was built for hydrology field work: **fast**, **scriptable**, and able to run
 ### Windows
 
 ```bat
-git clone https://github.com/GvntherLvtjens/LSPIV_Edge-release.git
+git clone https://github.com/WaterShadow-SHZU/LSPIV_Edge-release.git
 cd LSPIV_Edge-release
 ```
 
@@ -59,7 +59,7 @@ sudo apt update
 sudo apt install -y gfortran make python3 ffmpeg
 
 # 2) 进目录
-cd ~/LSPIV_Edge
+cd ~/LSPIV_Edge-release
 
 # 3) 编译解算器（约 1–3 分钟）
 bash tools/arm/build_arm.sh
@@ -107,7 +107,7 @@ bash process_video.sh your_video.mp4
 ### 外业跑完后的清理
 
 ```bash
-cd ~/LSPIV_Edge/runs/<本次运行>
+cd ~/LSPIV_Edge-release/runs/<本次运行>
 python3 ../../export_results.py .       # 先确保 CSV 已导出
 rm -rf frames/ img_pgm/ img_transf/      # 结果在 vel_raw/ vel_real/ export/
 ```
@@ -123,7 +123,7 @@ rm -rf frames/ img_pgm/ img_transf/      # 结果在 vel_raw/ vel_real/ export/
 ## Repository layout
 
 ```
-LSPIV_Edge/
+LSPIV_Edge-release/
 ├── process_video.bat / .sh     ← main entry point (video in, results out)
 ├── export_csv.bat / .sh        ← export results to CSV
 ├── lspiv_batch.py              ← the batch driver itself (all logic lives here)
@@ -147,7 +147,7 @@ LSPIV_Edge/
 │   ├── BUILDING.md             ← how to build on Windows and on ARM
 │   ├── PERFORMANCE.md          ← multicore analysis, benchmark methodology
 │   └── ARM-DEPLOYMENT-zh.md    ← ARM 部署说明
-└── examples/                   ← worked examples with real data
+└── examples/                   ← how to add an example (none included)
 ```
 
 ---
@@ -192,8 +192,11 @@ No measurement data is currently included. See [`examples/README.md`](examples/R
 
 | Component | License |
 |---|---|
-| `LSPIV_Edge` itself (Python driver, scripts, docs) | **MIT** — see [LICENSE](LICENSE) |
-| `tools/solver-patches/` — the Fortran solver | **LGPL-3.0**, inherited from INRAE upstream |
+| Original work: Python batch driver, shell and batch scripts, original build scripts (`tools/arm/build_arm.sh`, `tools/build_windows.bat`), tests, and documentation | **GPL-3.0-or-later** — GNU General Public License v3 or any later version; see [LICENSE](LICENSE) |
+| `tools/solver-patches/` — the Fortran solver, and `tools/arm/makefile` | **LGPL-3.0**, inherited from INRAE `Image_Velocimetry_Solver`. `tools/arm/makefile` keeps the upstream header (LGPL-3.0, or GPL-2.0 or any later version) |
+| `bin/windows/*.exe` — prebuilt Windows solver binaries | **LGPL-3.0**, built from the solver sources above |
+| FFmpeg and ffprobe | **Not bundled.** Install them separately and follow that build's license |
+| Fudaa-LSPIV GUI | **Not included.** It remains separate software under **GPL-2.0** |
 
 Upstream projects:
 

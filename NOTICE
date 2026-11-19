@@ -5,9 +5,12 @@ The distinction matters if you plan to redistribute or publish.
 
 ---
 
-## 1. Original work — MIT
+## 1. Original work — GPL-3.0-or-later
 
-The following are original and licensed under the MIT License (see `LICENSE`):
+The following are original and licensed under the GNU General Public License,
+version 3 or any later version (SPDX: `GPL-3.0-or-later`). The license text is
+`LICENSE`. Source files carry the standard GNU notice from "How to Apply These
+Terms to Your New Programs", which is the "or any later version" grant.
 
 | Path | Description |
 |---|---|
@@ -15,14 +18,19 @@ The following are original and licensed under the MIT License (see `LICENSE`):
 | `export_results.py` | DAT → CSV conversion (legacy `vel_raw/vel_real.csv` + multi-frame `physics_twin_series.csv` / `frames_manifest.json`) |
 | `preview_results.py` | Optional quiver plot |
 | `process_video.*`, `export_csv.*` | Entry-point scripts |
-| `tools/arm/build_arm.sh`, `tools/arm/makefile` | ARM build system |
+| `tools/arm/build_arm.sh` | ARM build script |
 | `tools/build_windows.bat` | Windows build script |
-| `docs/` | All documentation |
+| `docs/`, `examples/` | Documentation |
 | `tests/` | Regression tests |
+| `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `config.example.json`, `.gitattributes`, `.gitignore` | Project documentation, example configuration, and repository metadata |
+
+`tools/arm/makefile` is a modified copy of the upstream
+`Image_Velocimetry_Solver` makefile and keeps that file's license header
+(LGPL-3.0, or GPL-2.0 or any later version). See section 2.
 
 `export_results.py` (including the multi-frame export) is pure Python written for this
-project. It only *reads* the text `.dat` files the solver writes; it contains no code from the
-INRAE/IRSTEA Fortran solver or from Fudaa-LSPIV, so it stays MIT (not LGPL-3.0).
+project. It only reads the text `.dat` files the solver writes. It contains no code from the
+INRAE/IRSTEA Fortran solver or from Fudaa-LSPIV, so the GPL-3.0-or-later terms above apply to it.
 
 ---
 
@@ -52,6 +60,14 @@ The **unmodified originals** of those 4 files are preserved in
 
 Full license texts: `tools/solver-patches/LICENSE.upstream` (LGPL-3.0),
 `tools/solver-patches/COPYING.LGPL`, `tools/solver-patches/COPYING.GPL`.
+
+`tools/arm/makefile` carries the same upstream header. It stays under that
+solver license grant. The root `LICENSE` covers the original work in section 1.
+
+`kdtree2.f90` carries a separate notice: copyright Matthew Kennel (2004),
+Academic Free License version 1.1, "found in file LICENSE". This repository
+does not include that AFL 1.1 text. The root `LICENSE` covers the original
+work in section 1; `kdtree2.f90` keeps the notice in its own header.
 
 A detailed description of each change, with the upstream defect it addresses, is in
 [`docs/SOLVER-PATCHES.md`](docs/SOLVER-PATCHES.md).
