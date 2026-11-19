@@ -14,9 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Redraw docs/images/performance-comparison.png from the published notes.
+"""Redraw the Performance figures from the published notes.
 
-The figure is saved only after the plotted values have been read back out of:
+Four landscape figures are written only after the plotted values have
+been read back out of:
 
 - docs/PERFORMANCE.md — 935-frame conversion, 48-frame orthorectification
   scaling, and the stage-time table
@@ -33,19 +34,48 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
+from matplotlib import font_manager, ticker
 import matplotlib.pyplot as plt
 
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
-OUT = Path(__file__).resolve().parent / "performance-comparison.png"
+OUT_DIR = Path(__file__).resolve().parent
 
-INK = "#1c2430"
-MUTED = "#8e9aab"
+INK = "#1b2430"
+MUTED = "#97a2ad"
 ACCENT = "#1f4e79"
-PALE = "#d5dde6"
-GRID = "#e6e4df"
-NOTE = "#3e4a57"
+PALE = "#c5ced6"
+GRID = "#ecece8"
+NOTE = "#5c6670"
+PAPER = "#ffffff"
+
+# Optional; DejaVu Sans is the fallback when these files are not present.
+_FONT_CANDIDATES = (
+    Path("/usr/share/fonts/truetype/sand-box/custom/Source Sans Pro/SourceSansPro-Regular.ttf"),
+    Path("/usr/share/fonts/truetype/sand-box/custom/Source Sans Pro/SourceSansPro-Semibold.ttf"),
+    Path("/usr/share/fonts/truetype/sand-box/custom/Source Sans Pro/SourceSansPro-Bold.ttf"),
+    Path("/usr/share/fonts/truetype/sand-box/custom/Source Sans Pro/SourceSansPro-It.ttf"),
+)
+
+
+def setup_fonts():
+    family = "DejaVu Sans"
+    for path in _FONT_CANDIDATES:
+        if path.is_file():
+            font_manager.fontManager.addfont(str(path))
+            family = "Source Sans Pro"
+    plt.rcParams.update({
+        "font.family": family,
+        "font.size": 11,
+        "axes.unicode_minus": False,
+        "figure.facecolor": PAPER,
+        "savefig.facecolor": PAPER,
+        "text.color": INK,
+        "axes.labelcolor": INK,
+        "axes.titleweight": "semibold",
+    })
+    return family
 
 
 def strip_md(cell):
@@ -171,74 +201,58 @@ def load_measurements():
 
 
 def style_axis(ax, grid="x"):
-    ax.set_facecolor("white")
+    ax.set_facecolor(PAPER)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(grid == "y")
     for side in ("left", "bottom"):
         ax.spines[side].set_color(INK)
-        ax.spines[side].set_linewidth(0.6)
-    ax.tick_params(colors=INK, labelsize=8.5, length=3, width=0.6)
-    ax.grid(axis=grid, color=GRID, linewidth=0.6, zorder=0)
+        ax.spines[side].set_linewidth(0.7)
+    ax.tick_params(colors=INK, labelsize=11, length=0 if grid == "x" else 3, width=0.7)
+    if grid == "x":
+        ax.tick_params(axis="x", length=3)
+    ax.grid(axis=grid, color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
 
 
-def end_label(ax, x, y, text, color=INK):
-    ax.text(x, y, text, va="center", ha="left", fontsize=8, color=color, clip_on=False)
+def bar_label(ax, value, pos, text, xlim, inside_ok=True, color=INK):
+    """Place a label inside a long bar, otherwise just past the end."""
+    if inside_ok and value / xlim >= 0.28:
+        ax.text(
+            value - xlim * 0.018, pos, text,
+            va="center", ha="right", fontsize=11, color="white",
+            fontweight="semibold", clip_on=False, zorder=4,
+        )
+    else:
+        ax.text(
+            value + xlim * 0.018, pos, text,
+            va="center", ha="left", fontsize=11, color=color,
+            clip_on=False, zorder=4,
+        )
 
 
-def panel_title(ax, text):
-    ax.set_title(text, loc="left", fontsize=11, color=INK, pad=7)
+def new_figure(width, height, left, right, top, bottom):
+    fig, ax = plt.subplots(figsize=(width, height), dpi=160)
+    fig.subplots_adjust(left=left, right=right, top=top, bottom=bottom)
+    return fig, ax
 
 
-def color_tick(tick, accent):
-    tick.set_color(ACCENT if accent else INK)
-
-
-def draw(data):
-    plt.rcParams.update({
-        "font.family": "DejaVu Sans",
-        "axes.unicode_minus": False,
-        "figure.facecolor": "white",
-        "savefig.facecolor": "white",
-        "text.color": INK,
-        "axes.labelcolor": INK,
-    })
-
-    fig = plt.figure(figsize=(8.6, 8.35), dpi=130)
-    grid = fig.add_gridspec(
-        2, 2,
-        left=0.21, right=0.985, top=0.955, bottom=0.095,
-        wspace=0.56, hspace=0.46,
-        height_ratios=(1.0, 1.22),
-    )
-
-    draw_conversion(fig.add_subplot(grid[0, 0]), data)
-    draw_ortho(fig.add_subplot(grid[0, 1]), data)
-    draw_p5(fig, grid[1, 0].subgridspec(
-        2, 2,
-        height_ratios=(1.25, 1.05),
-        width_ratios=(1.0, 1.0),
-        wspace=0.48,
-        hspace=1.15,
-    ), data)
-    draw_stages(fig.add_subplot(grid[1, 1]), data)
-
+def figure_title(fig, text, x):
     fig.text(
-        0.21, 0.038,
-        "Blue marks the default in (a), (b), and (c), and the largest stage in (d).  "
-        "The pale tip in (d) is the documented ~12–16 s range.",
-        fontsize=7.4, color=NOTE, ha="left", va="bottom",
+        x, 0.93, text,
+        ha="left", va="top", fontsize=14, color=INK, fontweight="semibold",
     )
-    fig.text(
-        0.21, 0.012,
-        "Sources: docs/PERFORMANCE.md, docs/SOLVER-PATCHES.md, docs/ARM-DEPLOYMENT-zh.md.",
-        fontsize=7.4, color=NOTE, ha="left", va="bottom",
-    )
-    fig.savefig(OUT)
+
+
+def save(fig, name):
+    path = OUT_DIR / name
+    fig.savefig(path, dpi=160)
     plt.close(fig)
+    print("Wrote %s (%d bytes)" % (path, path.stat().st_size))
+    return path
 
 
-def draw_conversion(ax, data):
+def draw_conversion(data):
     labels = (
         "One ffmpeg per frame",
         "One ffmpeg per batch",
@@ -247,98 +261,118 @@ def draw_conversion(ax, data):
     values = data["conversion_s"]
     colors = (MUTED, MUTED, ACCENT)
     positions = (0, 1, 2)
+    xlim = 210
+
+    fig, ax = new_figure(10.8, 3.25, left=0.26, right=0.97, top=0.80, bottom=0.20)
+    figure_title(fig, "Frame conversion  ·  935 frames of 1920×1080", x=0.02)
     ax.barh(positions, values, color=colors, height=0.62, zorder=3)
     ax.set_yticks(positions, labels)
     ax.invert_yaxis()
-    ax.set_xlabel("Seconds", fontsize=8.5)
-    ax.set_xlim(0, 230)
+    ax.set_xlim(0, xlim)
+    ax.set_xlabel("Seconds", fontsize=11)
     style_axis(ax, grid="x")
-    panel_title(ax, "(a)  Frame conversion, 935 frames")
     for pos, value, color in zip(positions, values, colors):
-        end_label(ax, value + 4, pos, "~%g s" % value, INK)
-        color_tick(ax.get_yticklabels()[pos], color == ACCENT)
-    ax.tick_params(axis="y", length=0)
+        text = "~%g s" % value
+        bar_label(ax, value, pos, text, xlim, color=ACCENT if color == ACCENT else INK)
+        ax.get_yticklabels()[pos].set_color(ACCENT if color == ACCENT else INK)
+        if color == ACCENT:
+            ax.get_yticklabels()[pos].set_fontweight("semibold")
+    save(fig, "performance-conversion.png")
 
 
-def draw_ortho(ax, data):
+def draw_ortho(data):
     processes = data["processes"]
     values = data["ortho_s_per_frame"]
     positions = list(range(len(processes)))
     colors = [ACCENT if count == 4 else MUTED for count in processes]
-    ax.bar(positions, values, color=colors, width=0.68, zorder=3)
+
+    fig, ax = new_figure(10.8, 3.65, left=0.10, right=0.97, top=0.78, bottom=0.20)
+    figure_title(fig, "Orthorectification  ·  fastest at 4 processes (the default)", x=0.02)
+    ax.plot(positions, values, color="#8a96a2", linewidth=1.6, zorder=2)
+    ax.bar(positions, values, color=colors, width=0.58, zorder=3)
     ax.set_xticks(positions, [str(count) for count in processes])
     ax.set_xlim(-0.55, len(processes) - 0.45)
-    ax.set_ylim(0, 0.42)
-    ax.set_xlabel("Processes, 48-frame batches", fontsize=8.5)
-    ax.set_ylabel("Seconds per frame", fontsize=8.5)
+    ax.set_ylim(0, 0.40)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.10))
+    ax.set_xlabel("Processes  ·  48-frame batches", fontsize=11)
+    ax.set_ylabel("Seconds per frame", fontsize=11)
     style_axis(ax, grid="y")
-    panel_title(ax, "(b)  Orthorectification")
+    ax.spines["left"].set_visible(True)
     for pos, value, count in zip(positions, values, processes):
-        label_color = ACCENT if count == 4 else INK
+        is_default = count == 4
         ax.text(
-            pos, value + 0.010, "%.3f" % value,
-            ha="center", va="bottom", fontsize=7.4, color=label_color,
+            pos, value + 0.012, "%.3f" % value,
+            ha="center", va="bottom", fontsize=10.5,
+            color=ACCENT if is_default else INK,
+            fontweight="semibold" if is_default else "regular",
         )
-        color_tick(ax.get_xticklabels()[pos], count == 4)
+        ax.get_xticklabels()[pos].set_color(ACCENT if is_default else INK)
+        if is_default:
+            ax.get_xticklabels()[pos].set_fontweight("semibold")
+    save(fig, "performance-ortho.png")
 
 
-def draw_p5(fig, inner, data):
-    time_ax = fig.add_subplot(inner[0, :])
-    mb_ax = fig.add_subplot(inner[1, 0])
-    gb_ax = fig.add_subplot(inner[1, 1])
+def draw_p5(data):
+    fig = plt.figure(figsize=(10.8, 3.7), dpi=160)
+    figure_title(fig, "Solver read format  ·  1089×591 image", x=0.02)
+    grid = fig.add_gridspec(
+        1, 3,
+        left=0.13, right=0.98, top=0.74, bottom=0.20,
+        wspace=0.62,
+    )
+    time_ax = fig.add_subplot(grid[0, 0])
+    mb_ax = fig.add_subplot(grid[0, 1])
+    gb_ax = fig.add_subplot(grid[0, 2])
 
-    labels = ("P2 ASCII", "P5 binary")
-    positions = (0, 1)
-    time_values = (data["p2_s_per_pair"], data["p5_s_per_pair"])
-    time_colors = (MUTED, ACCENT)
-    time_ax.barh(positions, time_values, color=time_colors, height=0.58, zorder=3)
-    time_ax.set_yticks(positions, labels)
-    time_ax.invert_yaxis()
-    time_ax.set_xlim(0, 22)
-    time_ax.set_xlabel("Seconds per pair", fontsize=8.5)
-    style_axis(time_ax, grid="x")
-    panel_title(time_ax, "(c)  Solver read, 1089×591")
-    end_label(time_ax, time_values[0] + 0.35, 0, "14.85 s")
-    end_label(time_ax, time_values[1] + 0.35, 1, "0.25 s", ACCENT)
-    time_ax.text(8.2, 1, "59×", va="center", ha="left", fontsize=10, color=INK)
-    for pos, color in zip(positions, time_colors):
-        color_tick(time_ax.get_yticklabels()[pos], color == ACCENT)
-    time_ax.tick_params(axis="y", length=0)
+    def pair(ax, values, labels, xlim, xlabel, title):
+        positions = (0, 1)
+        colors = (MUTED, ACCENT)
+        names = ("P2 ASCII", "P5 binary")
+        ax.barh(positions, values, color=colors, height=0.58, zorder=3)
+        ax.set_yticks(positions, names)
+        ax.invert_yaxis()
+        ax.set_xlim(0, xlim)
+        ax.set_xlabel(xlabel, fontsize=10.5)
+        style_axis(ax, grid="x")
+        ax.set_title(title, loc="left", fontsize=11, color=NOTE, pad=8, fontweight="regular")
+        for pos, value, text, color in zip(positions, values, labels, colors):
+            bar_label(
+                ax, value, pos, text, xlim,
+                inside_ok=(value / xlim >= 0.28),
+                color=ACCENT if color == ACCENT else INK,
+            )
+            ax.get_yticklabels()[pos].set_color(ACCENT if color == ACCENT else INK)
+            if color == ACCENT:
+                ax.get_yticklabels()[pos].set_fontweight("semibold")
 
-    paired_bars(
+    pair(
+        time_ax,
+        (data["p2_s_per_pair"], data["p5_s_per_pair"]),
+        ("14.85 s", "0.25 s"),
+        18.5,
+        "Seconds per pair",
+        "Read time  ·  59× faster",
+    )
+    pair(
         mb_ax,
         (data["p2_mb"], data["p5_mb"]),
-        "Image (MB)",
-        ("~2.5", "~0.64"),
-        3.7,
+        ("~2.5 MB", "~0.64 MB"),
+        3.4,
+        "Megabytes",
+        "One image",
     )
-    paired_bars(
+    pair(
         gb_ax,
         (data["p2_dir_gb"], data["p5_dir_gb"]),
-        "GB each\nimg_pgm/\nimg_transf/",
-        ("~2.4", "~0.6"),
-        3.6,
+        ("~2.4 GB", "~0.6 GB"),
+        3.2,
+        "Gigabytes",
+        "Each of img_pgm/ and img_transf/",
     )
+    save(fig, "performance-p5.png")
 
 
-def paired_bars(ax, values, title, labels, xlim, xlabel=None):
-    positions = (0, 1)
-    colors = (MUTED, ACCENT)
-    ax.barh(positions, values, color=colors, height=0.58, zorder=3)
-    ax.set_yticks(positions, ("P2", "P5"))
-    ax.invert_yaxis()
-    ax.set_xlim(0, xlim)
-    style_axis(ax, grid="x")
-    ax.set_title(title, loc="left", fontsize=8.5, color=INK, pad=3)
-    if xlabel:
-        ax.set_xlabel(xlabel, fontsize=7)
-    for pos, value_label, color in zip(positions, labels, colors):
-        end_label(ax, values[pos] + xlim * 0.03, pos, value_label, ACCENT if color == ACCENT else INK)
-        color_tick(ax.get_yticklabels()[pos], color == ACCENT)
-    ax.tick_params(axis="y", labelsize=8, length=0)
-
-
-def draw_stages(ax, data):
+def draw_stages(data):
     labels = (
         "Frame extraction",
         "PNG → PGM",
@@ -350,6 +384,10 @@ def draw_stages(ax, data):
     point_values = data["stage_s"]
     real_low, real_high = data["real_range_s"]
     colors = (MUTED, MUTED, ACCENT, MUTED, MUTED)
+    xlim = 58
+
+    fig, ax = new_figure(10.8, 3.85, left=0.22, right=0.97, top=0.80, bottom=0.28)
+    figure_title(fig, "Stage time  ·  same 935-frame run", x=0.02)
     ax.barh(positions[:4], point_values, color=colors[:4], height=0.58, zorder=3)
     ax.barh(positions[4], real_low, color=MUTED, height=0.58, zorder=3)
     ax.barh(
@@ -358,22 +396,35 @@ def draw_stages(ax, data):
     )
     ax.set_yticks(positions, labels)
     ax.invert_yaxis()
-    ax.set_xlim(0, 54)
-    ax.set_xlabel("Seconds", fontsize=8.5)
+    ax.set_xlim(0, xlim)
+    ax.set_xlabel("Seconds", fontsize=11)
     style_axis(ax, grid="x")
-    panel_title(ax, "(d)  Stage time, 935-frame run")
     for pos, value in zip(positions[:4], point_values):
-        end_label(ax, value + 0.8, pos, "~%g s" % value)
-    end_label(ax, real_high + 0.8, positions[4], "~12–16 s")
-    for pos, color in zip(positions, colors):
-        color_tick(ax.get_yticklabels()[pos], color == ACCENT)
-    ax.tick_params(axis="y", length=0)
+        extra = "  ·  largest stage, ~46%" if pos == 2 else ""
+        color = ACCENT if pos == 2 else INK
+        bar_label(ax, value, pos, "~%g s%s" % (value, extra), xlim, color=color)
+        ax.get_yticklabels()[pos].set_color(color)
+        if pos == 2:
+            ax.get_yticklabels()[pos].set_fontweight("semibold")
+    bar_label(ax, real_high, positions[4], "~12–16 s", xlim, inside_ok=False)
+    ax.get_yticklabels()[4].set_color(INK)
+    fig.text(
+        0.22, 0.055,
+        "The light tip on Real coordinates is the documented 12–16 s range.",
+        ha="left", va="bottom", fontsize=9.5, color=NOTE,
+    )
+    save(fig, "performance-stages.png")
 
 
 def main():
+    setup_fonts()
     data = load_measurements()
-    draw(data)
-    print("Wrote %s" % OUT)
+
+    draw_conversion(data)
+    draw_ortho(data)
+    draw_p5(data)
+    draw_stages(data)
+
     print("conversion_s", data["conversion_s"])
     print("ortho_s_per_frame", list(zip(data["processes"], data["ortho_s_per_frame"])))
     print(
