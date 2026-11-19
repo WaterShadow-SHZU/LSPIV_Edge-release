@@ -23,7 +23,7 @@ worse than a missing one.
 **No build step, no dependencies.** The Python is standard-library only.
 
 ```bash
-git clone https://github.com/GvntherLvtjens/LSPIV_Edge-release.git
+git clone https://github.com/WaterShadow-SHZU/LSPIV_Edge-release.git
 cd LSPIV_Edge-release
 python3 lspiv_batch.py --help
 ```
@@ -119,5 +119,6 @@ The sanity-check procedure in
 ## License
 
 By contributing, you agree your contributions are licensed under the same terms as the
-files you modify — MIT for the driver, docs, and scripts; LGPL-3.0 for the solver
-sources. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+files you modify — GPL-3.0-or-later for the driver, documentation, tests, shell and
+batch scripts, and the original build scripts; LGPL-3.0 for the solver sources and
+for `tools/arm/makefile`. See [LICENSE](LICENSE) and [NOTICE](NOTICE).

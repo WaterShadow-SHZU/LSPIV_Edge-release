@@ -44,13 +44,13 @@ make fudaa_linux ARCHFLAGS=''
 
 ## 1. 要拷哪些东西到板子
 
-将本仓库（`LSPIV_Edge`）和校准文件复制到板上即可。解算器源码已包含在仓库中。
+将本仓库和校准文件复制到板上即可。默认检出目录是 `~/LSPIV_Edge-release`。解算器源码已包含在仓库中。
 
-> 下文以 `~/LSPIV_Edge/` 为部署目录；部署在其他目录时，按板上实际路径替换。
+> 下文以 `~/LSPIV_Edge-release/` 为部署目录；部署在其他目录时，按板上实际路径替换。
 
 | # | 拷什么 | 为什么 | 体积 |
 |---|---|---|---|
-| 1 | **整个 `LSPIV_Edge` 仓库** | 主程序 + 补丁源码 + ARM 构建脚本，全在里面 | 含 Windows 解算器 |
+| 1 | **整个 `LSPIV_Edge-release` 目录** | 主程序 + 补丁源码 + ARM 构建脚本，全在里面 | 含 Windows 解算器 |
 | 2 | **你的校准文件**（电脑上用 GUI 做好的那 5 个） | 正射/网格/PIV 参数，缺了跑不了 | 极小 |
 | 3 | *（可选）* 视频文件 | 有就一起拷，没有就在板子上现录 | 看视频大小 |
 
@@ -70,12 +70,12 @@ make fudaa_linux ARCHFLAGS=''
 
 ```bash
 # 方式一：git（板子能联网时）
-git clone --depth 1 https://github.com/GvntherLvtjens/LSPIV_Edge-release.git ~/LSPIV_Edge
+git clone --depth 1 https://github.com/WaterShadow-SHZU/LSPIV_Edge-release.git ~/LSPIV_Edge-release
 
 # 方式二：rsync（可断点续传，能排除大目录）
 rsync -av --exclude 'runs/' --exclude 'bin/windows/' --exclude '.venv/' \
       --exclude '__pycache__/' \
-      LSPIV_Edge/   pi@<板子IP>:~/LSPIV_Edge/
+      LSPIV_Edge-release/   pi@<板子IP>:~/LSPIV_Edge-release/
 
 # 方式三：U 盘
 ```
@@ -92,7 +92,7 @@ sudo apt update
 sudo apt install -y gfortran make python3 ffmpeg
 
 # 2) 进目录
-cd ~/LSPIV_Edge
+cd ~/LSPIV_Edge-release
 
 # 3) 编译解算器（约 1–3 分钟）
 bash tools/arm/build_arm.sh
@@ -182,7 +182,7 @@ bash process_video.sh your_video.mp4 ./calib -- --every 5
 Type=Application
 Name=LSPIV 跑视频
 Terminal=true
-Exec=bash -c 'bash "$HOME/LSPIV_Edge/process_video.sh" "$1"; echo; read -p "按回车关闭"', --
+Exec=bash -c 'bash "$HOME/LSPIV_Edge-release/process_video.sh" "$1"; echo; read -p "按回车关闭"', --
 ```
 
 > 快捷方式调用的仍是 `process_video.sh`。测试时可直接从命令行运行，便于查看错误信息。
@@ -274,7 +274,7 @@ ARM 内存带宽较低，P5 格式在 ARM 上的收益可能高于 PC。本仓�
 板上只留结果，清掉中间产物：
 
 ```bash
-cd ~/LSPIV_Edge/runs/<本次运行>
+cd ~/LSPIV_Edge-release/runs/<本次运行>
 python3 ../../export_results.py .       # 先确保 CSV 已导出
 rm -rf frames/ img_pgm/ img_transf/      # 结果在 vel_raw/ vel_real/ export/
 ```
@@ -286,7 +286,7 @@ rm -rf frames/ img_pgm/ img_transf/      # 结果在 vel_raw/ vel_real/ export/
 ## 7. 板上目录长这样
 
 ```
-~/LSPIV_Edge/
+~/LSPIV_Edge-release/
 ├── lspiv_batch.py            ← 主程序（跨平台：.exe / .x 自动解析 + ffmpeg 回退）
 ├── process_video.sh          ← 一键流水线
 ├── export_csv.sh / export_results.py
